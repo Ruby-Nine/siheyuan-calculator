@@ -1,1 +1,1 @@
-{"name":"siheyuan-calculator","version":"1.0.0","private":true,"type":"module","scripts":{"test":"node --test","start":"python -m http.server 4173"}}
+{"name":"siheyuan-calculator","version":"1.0.0","private":true,"type":"module","scripts":{"build":"node build.js","test":"node --test","start":"python -m http.server 4173"}}

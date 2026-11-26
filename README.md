@@ -4,7 +4,7 @@
 
 ## 本地使用
 
-运行 `python -m http.server 4173`，访问 http://localhost:4173 。无需安装前端依赖。
+直接双击 `index.html` 即可使用，也可以运行 `python -m http.server 4173`，访问 http://localhost:4173 。无需安装前端依赖。修改计算代码后运行 `npm run build` 生成浏览器脚本。
 
 运行 `npm test` 校验全部 54 种计算结果和奇数上限边界。
 
