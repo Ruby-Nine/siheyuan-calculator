@@ -1,4 +1,4 @@
-import {calculate, combinations, optimalLineups} from './calculator.js';
+import {calculate, combinations} from './calculator.js';
 const state = {pepe: 1, rabbit: 1, silver: 1, m3: 1};
 const characters = [
   {id:'pepe',name:'佩佩',icon:'佩',role:'核心',info:['','每次 +1 · 基础上限 9','每次 +2 · 基础上限 18']},
@@ -81,30 +81,22 @@ el('gain-rows').innerHTML = tableRow(['全员普通', baseline, '基准', '—']
   return tableRow([character.name, total, '+' + added, percent + '%']);
 }).join('');
 
-function describeLineup({copies, layers, targets}) {
-  const lineup = characters.flatMap(({name}, i) => {
-    const n = copies[i];
-    if (!n) return [];
-    return [(n === 3 ? '精锐' : '普通') + name + (n === 2 ? '×2' : '')];
-  }).join('＋');
-  if (layers.length === 1) return lineup;
-  const supportNames = ['奶兔', '银灰'].flatMap((name, i) => {
-    const n = copies[i + 1];
-    return Array(n === 3 ? 1 : n).fill(name);
-  });
-  const split = layers.map((value, i) => {
-    const assigned = supportNames.filter((name, k) => targets[k] === i);
-    return '佩佩' + (i + 1) + (assigned.length ? '（' + assigned.join('＋') + '）' : '') + ' ' + value + ' 层';
-  });
-  return lineup + '<br><small>' + split.join('；') + '</small>';
+const teamsByCopies = Array.from({length: 13}, () => []);
+const copyCost = [0, 1, 3];
+for (const row of rows) {
+  for (const pepe of [1, 2]) {
+    const team = {...row, pepe};
+    const count = characters.reduce((sum, {id}) => sum + copyCost[team[id]], 0);
+    const lineup = characters.filter(({id}) => team[id] > 0)
+      .map(({id, name}) => labels[team[id]] + name).join('＋');
+    teamsByCopies[count].push({lineup, total: calculate(team).total});
+  }
 }
 
-function renderBest() {
-  const results = optimalLineups(Number(el('slots').value));
-  el('best-rows').innerHTML = results.map(({total, winners}, index) =>
-    tableRow([index + 1 + ' 张', winners.length ? total : '—',
-      winners.length ? winners.map(describeLineup).join('<hr>') : '该上场位限制下无法恰好用满'])
-  ).join('');
-}
-el('slots').addEventListener('change', renderBest);
-renderBest();
+el('best-rows').innerHTML = teamsByCopies.slice(1).map((teams, index) => {
+  const count = index + 1;
+  if (!teams.length) return tableRow([count + ' 张', '—', '没有恰好用满该张数的阵容']);
+  const highest = Math.max(...teams.map(team => team.total));
+  const winners = teams.filter(team => team.total === highest);
+  return tableRow([count + ' 张', highest, winners.map(team => team.lineup).join('<br>')]);
+}).join('');
