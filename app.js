@@ -27,7 +27,7 @@ const rows = combinations().sort((left, right) => {
   }
   return 0;
 });
-el('all-rows').innerHTML = rows.map((r,i) => `<tr data-row="${i}"><td>${['佩佩', ...characters.slice(1).filter(c => r[c.id]).map(c => c.name)].join('＋')}</td><td>${labels[r.rabbit].replace('不上场','—')}</td><td>${labels[r.silver].replace('不上场','—')}</td><td>${labels[r.m3].replace('不上场','—')}</td><td>${r.ordinary}/${r.elite}</td></tr>`).join('');
+el('all-rows').innerHTML = rows.map((r,i) => `<tr data-row="${i}"><td>${['佩佩', ...characters.slice(1).filter(c => r[c.id]).map(c => c.name)].join('＋')}</td><td>${labels[r.rabbit].replace('不上场','—')}</td><td>${labels[r.silver].replace('不上场','—')}</td><td>${labels[r.m3].replace('不上场','—')}</td><td>${r.ordinary}</td><td>${r.elite}</td></tr>`).join('');
 function render() {
   const r = calculate(state);
   document.querySelectorAll('[data-character]').forEach(b => b.setAttribute('aria-pressed', String(state[b.dataset.character] === Number(b.dataset.value))));
