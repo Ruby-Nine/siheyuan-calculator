@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#bdf567">
+  <meta name="description" content="明日方舟卫戍协议四合院叠层计算器，支持佩佩、奶兔、银灰和M3的54种组合。">
+  <title>四合院叠层计算器 · 卫戍协议</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='10' fill='%23bdf567'/%3E%3Ctext x='20' y='29' text-anchor='middle' font-size='27'%3E叠%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="./style.css"><script type="module" src="./app.js"></script>
+</head>
+<body>
+  <div class="site-wrap">
+    <header><a class="brand" href="./"><span class="brand-icon">▤</span> 妙妙小工具</a><span class="header-tag">明日方舟 · 卫戍协议</span></header>
+    <main>
+      <div class="intro"><div class="eyebrow"><span></span> RHODES ISLAND / STACK LAB</div><h1>四合院<span>叠层计算器</span></h1><p>配好你的四合院，看看这一回合能叠多少层。</p></div>
+      <div class="calculator">
+        <section class="team panel" aria-labelledby="team-title">
+          <div class="section-head"><div><span class="section-number">01</span><h2 id="team-title">配置阵容</h2></div><button id="reset" class="text-button" type="button">重置</button></div>
+          <p class="muted section-note">切换精锐状态，结果实时更新</p>
+          <div id="characters"></div>
+          <div class="presets"><span>快捷配置</span><button type="button" data-preset="ordinary">全员普通</button><button type="button" data-preset="elite">全员精锐</button><button type="button" data-preset="solo">单佩佩</button></div>
+        </section>
+        <section class="result panel" aria-labelledby="result-title">
+          <div class="result-top"><span id="result-title">单回合最终叠层</span><span class="live-dot">实时计算</span></div>
+          <div class="result-number" aria-live="polite" aria-atomic="true"><strong id="total">36</strong><span>层</span></div>
+          <div class="result-chips"><span>触发 <b id="triggers">18</b> 次</span><span>单普通佩佩的 <b id="efficiency">4.00</b> 倍</span></div>
+          <div class="bar" aria-hidden="true"><span id="base-bar"></span><span id="bonus-bar"></span><span id="extra-bar"></span></div>
+          <div class="breakdown"><div><span class="dot base"></span><span>佩佩基础上限</span><b id="base">9</b></div><div><span class="dot bonus"></span><span>银灰＋M3 <small id="bonus-label">+105%</small></span><b id="bonus-added">+9</b></div><div><span class="dot extra"></span><span>奶兔额外叠层</span><b id="extra">+18</b></div></div>
+          <div class="stats"><div><span>佩佩实际上限</span><b id="limit">18</b></div><div><span>正常单次叠层</span><b id="normal">2</b></div><div><span>最后一次叠层</span><b id="final">2</b></div></div>
+          <p id="last-note" class="last-note">每次触发：佩佩 1 层 ＋ 奶兔 1 层</p>
+        </section>
+      </div>
+      <section class="formula panel"><div><span class="eyebrow">HOW IT WORKS</span><h2>每一层，都算清楚</h2><p>银灰与 M3 加成先相加，再统一向下取整。</p></div><div class="formula-content"><code id="formula">18 + 1 × 18 = 36</code><p id="limit-formula"></p><p>奶兔额外叠层不占用佩佩上限；最后一次不足 2 层时，奶兔仍完整触发。</p></div></section>
+      <details class="table-panel panel"><summary><div><span class="section-number">02</span><span>全部组合速查</span><small>27 种阵容 · 54 种结果</small></div><span class="chevron">⌄</span></summary><div class="table-scroll"><table><caption class="sr-only">各队友状态下普通与精锐佩佩的单回合叠层</caption><thead><tr><th>奶兔</th><th>银灰</th><th>M3</th><th>普通佩佩</th><th>精锐佩佩</th></tr></thead><tbody id="all-rows"></tbody></table></div><p class="table-foot">— 表示不上场。假设每回合均能叠满佩佩上限。</p></details>
+      <p class="assumption">计算假设：每回合触发次数充足，佩佩均能叠满自身上限。</p>
+    </main>
+    <footer><span>妙妙小工具 / 四合院叠层实验室</span><span>非官方玩家工具</span></footer>
+  </div>
+  <noscript>请启用 JavaScript 使用实时计算器。</noscript>
+</body>
+</html>

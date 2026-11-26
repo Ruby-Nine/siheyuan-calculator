@@ -1,0 +1,35 @@
+import {calculate, combinations} from './calculator.js';
+const state = {pepe: 1, rabbit: 1, silver: 1, m3: 1};
+const characters = [
+  {id:'pepe',name:'佩佩',icon:'佩',role:'核心',info:['','每次 +1 · 基础上限 9','每次 +2 · 基础上限 18']},
+  {id:'rabbit',name:'奶兔',icon:'兔',role:'额外叠层',info:['不上场','每次触发额外 +1 层','每次触发额外 +2 层']},
+  {id:'silver',name:'银灰',icon:'银',role:'上限加成',info:['不上场','佩佩叠层上限 +75%','佩佩叠层上限 +150%']},
+  {id:'m3',name:'M3',icon:'M',role:'上限加成',info:['不上场','佩佩叠层上限 +30%','佩佩叠层上限 +60%']}
+];
+const labels = ['不上场','普通','精锐'];
+const el = id => document.getElementById(id);
+const set = (id,value) => { el(id).textContent = value; };
+el('characters').innerHTML = characters.map(c => `<div class="character"><div class="identity"><span class="avatar ${c.id}" aria-hidden="true">${c.icon}</span><div><h3>${c.name}<span class="role">${c.role}</span></h3><p id="${c.id}-info"></p></div></div><div class="segmented" role="group" aria-label="${c.name}状态">${(c.id === 'pepe' ? [1,2] : [0,1,2]).map(v => `<button type="button" data-character="${c.id}" data-value="${v}" aria-pressed="false">${labels[v]}</button>`).join('')}</div></div>`).join('');
+const rows = combinations();
+el('all-rows').innerHTML = rows.map((r,i) => `<tr data-row="${i}"><td>${labels[r.rabbit].replace('不上场','—')}</td><td>${labels[r.silver].replace('不上场','—')}</td><td>${labels[r.m3].replace('不上场','—')}</td><td>${r.ordinary}</td><td>${r.elite}</td></tr>`).join('');
+function render() {
+  const r = calculate(state);
+  document.querySelectorAll('[data-character]').forEach(b => b.setAttribute('aria-pressed', String(state[b.dataset.character] === Number(b.dataset.value))));
+  characters.forEach(c => set(`${c.id}-info`, c.info[state[c.id]]));
+  ['total','triggers','base','limit','normal','final'].forEach(key => set(key,r[key]));
+  set('efficiency',r.efficiency.toFixed(2)); set('bonus-label',`+${r.bonus}%`); set('bonus-added',`+${r.limit-r.base}`); set('extra',`+${r.extra}`);
+  [['base',r.base],['bonus',r.limit-r.base],['extra',r.extra]].forEach(([key,v]) => el(`${key}-bar`).style.width = `${v/r.total*100}%`);
+  set('formula',`${r.limit} + ${state.rabbit} × ${r.triggers} = ${r.total}`);
+  set('limit-formula',`佩佩上限 = ⌊${r.base} × (1 + ${state.silver*75}% + ${state.m3*30}%)⌋ = ${r.limit}；触发次数 = ⌈${r.limit} ÷ ${state.pepe}⌉ = ${r.triggers}`);
+  set('last-note', r.last !== state.pepe ? `最后一次：佩佩 ${r.last} 层 ＋ 奶兔 ${state.rabbit} 层 = ${r.final} 层，奶兔完整触发。` : `每次触发：佩佩 ${state.pepe} 层 ＋ 奶兔 ${state.rabbit} 层`);
+  document.querySelectorAll('[data-row]').forEach(tr => {const row=rows[Number(tr.dataset.row)];tr.classList.toggle('current',['rabbit','silver','m3'].every(k=>row[k]===state[k]));});
+}
+document.addEventListener('click', e => {
+  const button = e.target.closest('button'); if (!button) return;
+  if (button.dataset.character) {state[button.dataset.character]=Number(button.dataset.value); render();}
+  if (button.dataset.preset || button.id === 'reset') {
+    const preset=button.dataset.preset;
+    Object.assign(state,preset==='elite'?{pepe:2,rabbit:2,silver:2,m3:2}:preset==='solo'?{pepe:1,rabbit:0,silver:0,m3:0}:{pepe:1,rabbit:1,silver:1,m3:1}); render();
+  }
+});
+render();
