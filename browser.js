@@ -34,7 +34,7 @@ const el = id => document.getElementById(id);
 const set = (id,value) => { el(id).textContent = value; };
 el('characters').innerHTML = characters.map(c => `<div class="character"><div class="identity"><span class="avatar ${c.id}" aria-hidden="true">${c.icon}</span><div><h3>${c.name}<span class="role">${c.role}</span></h3><p id="${c.id}-info"></p></div></div><div class="segmented" role="group" aria-label="${c.name}状态">${(c.id === 'pepe' ? [1,2] : [0,1,2]).map(v => `<button type="button" data-character="${c.id}" data-value="${v}" aria-pressed="false">${labels[v]}</button>`).join('')}</div></div>`).join('');
 const rows = combinations();
-el('all-rows').innerHTML = rows.map((r,i) => `<tr data-row="${i}"><td>${labels[r.rabbit].replace('不上场','—')}</td><td>${labels[r.silver].replace('不上场','—')}</td><td>${labels[r.m3].replace('不上场','—')}</td><td>${r.ordinary}</td><td>${r.elite}</td></tr>`).join('');
+el('all-rows').innerHTML = rows.map((r,i) => `<tr data-row="${i}"><td>${['佩佩', ...characters.slice(1).filter(c => r[c.id]).map(c => c.name)].join('＋')}</td><td>${labels[r.rabbit].replace('不上场','—')}</td><td>${labels[r.silver].replace('不上场','—')}</td><td>${labels[r.m3].replace('不上场','—')}</td><td>${r.ordinary}</td><td>${r.elite}</td></tr>`).join('');
 function render() {
   const r = calculate(state);
   document.querySelectorAll('[data-character]').forEach(b => b.setAttribute('aria-pressed', String(state[b.dataset.character] === Number(b.dataset.value))));
@@ -56,5 +56,54 @@ document.addEventListener('click', e => {
   }
 });
 render();
+
+const tabs = [...document.querySelectorAll('[role="tab"]')];
+function selectTab(active) {
+  for (const tab of tabs) {
+    const selected = tab === active;
+    tab.setAttribute('aria-selected', String(selected));
+    tab.tabIndex = selected ? 0 : -1;
+    el(tab.getAttribute('aria-controls')).hidden = !selected;
+  }
+}
+tabs.forEach((tab, index) => {
+  tab.addEventListener('click', () => selectTab(tab));
+  tab.addEventListener('keydown', event => {
+    const target = {ArrowRight: (index + 1) % tabs.length, ArrowLeft: (index + tabs.length - 1) % tabs.length, Home: 0, End: tabs.length - 1}[event.key];
+    if (target === undefined) return;
+    event.preventDefault();
+    tabs[target].focus();
+    selectTab(tabs[target]);
+  });
+});
+
+const baseline = calculate().total;
+function tableRow(cells) {
+  return '<tr>' + cells.map(cell => '<td>' + cell + '</td>').join('') + '</tr>';
+}
+el('gain-rows').innerHTML = tableRow(['全员普通', baseline, '基准', '—']) + characters.map(character => {
+  const total = calculate({[character.id]: 2}).total;
+  const added = total - baseline;
+  const percent = Number((100 * added / baseline).toFixed(2));
+  return tableRow([character.name, total, '+' + added, percent + '%']);
+}).join('');
+
+const fullTeams = rows.filter(row => row.rabbit && row.silver && row.m3);
+const byCount = Array.from({length: 5}, () => []);
+for (const row of fullTeams) {
+  for (const pepe of [1, 2]) {
+    const team = {...row, pepe};
+    const elites = characters.filter(character => team[character.id] === 2);
+    byCount[elites.length].push({
+      total: calculate(team).total,
+      names: elites.map(character => character.name).join('＋') || '全员普通'
+    });
+  }
+}
+el('best-rows').innerHTML = byCount.map((teams, count) => {
+  const highest = Math.max(...teams.map(team => team.total));
+  const winners = teams.filter(team => team.total === highest);
+  return tableRow([count + ' 张', highest, winners.map(team => team.names).join(' 或 ')]);
+}).join('');
 
 })();

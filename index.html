@@ -13,7 +13,7 @@
     <header><a class="brand" href="./"><span class="brand-icon">▤</span> 妙妙小工具</a><span class="header-tag">明日方舟 · 卫戍协议</span></header>
     <main>
       <div class="intro"><div class="eyebrow"><span></span> RHODES ISLAND / STACK LAB</div><h1>四合院<span>叠层计算器</span></h1><p>配好你的四合院，看看这一回合能叠多少层。</p></div>
-      <div class="calculator">
+      <div class="tabs" role="tablist" aria-label="查看内容"><button role="tab" id="tab-home" aria-controls="home" aria-selected="true" tabindex="0">计算器</button><button role="tab" id="tab-stacks" aria-controls="stacks" aria-selected="false" tabindex="-1">单回合叠层表</button><button role="tab" id="tab-gains" aria-controls="gains" aria-selected="false" tabindex="-1">精锐收益</button><button role="tab" id="tab-best" aria-controls="best" aria-selected="false" tabindex="-1">最优组合</button></div><section id="home" role="tabpanel" aria-labelledby="tab-home" tabindex="0"><div class="calculator">
         <section class="team panel" aria-labelledby="team-title">
           <div class="section-head"><div><span class="section-number">01</span><h2 id="team-title">配置阵容</h2></div><button id="reset" class="text-button" type="button">重置</button></div>
           <p class="muted section-note">切换精锐状态，结果实时更新</p>
@@ -31,7 +31,9 @@
         </section>
       </div>
       <section class="formula panel"><div><span class="eyebrow">HOW IT WORKS</span><h2>每一层，都算清楚</h2><p>银灰与 M3 加成先相加，再统一向下取整。</p></div><div class="formula-content"><code id="formula">18 + 1 × 18 = 36</code><p id="limit-formula"></p><p>奶兔额外叠层不占用佩佩上限；最后一次不足 2 层时，奶兔仍完整触发。</p></div></section>
-      <details class="table-panel panel"><summary><div><span class="section-number">02</span><span>全部组合速查</span><small>27 种阵容 · 54 种结果</small></div><span class="chevron">⌄</span></summary><div class="table-scroll"><table><caption class="sr-only">各队友状态下普通与精锐佩佩的单回合叠层</caption><thead><tr><th>奶兔</th><th>银灰</th><th>M3</th><th>普通佩佩</th><th>精锐佩佩</th></tr></thead><tbody id="all-rows"></tbody></table></div><p class="table-foot">— 表示不上场。假设每回合均能叠满佩佩上限。</p></details>
+      </section><section id="stacks" role="tabpanel" aria-labelledby="tab-stacks" tabindex="0" hidden><div class="panel sheet"><h2>单回合叠层表</h2><p>27 种队友配置，每行分别列出普通和精锐佩佩的结果。</p><div class="table-scroll"><table aria-label="单回合叠层表"><thead><tr><th scope="col">阵容</th><th scope="col">奶兔</th><th scope="col">银灰</th><th scope="col">M3</th><th scope="col">普通佩佩</th><th scope="col">精锐佩佩</th></tr></thead><tbody id="all-rows"></tbody></table></div><p>— 表示不上场，浅绿色标出计算器当前的队友配置。</p></div></section>
+<section id="gains" role="tabpanel" aria-labelledby="tab-gains" tabindex="0" hidden><div class="panel sheet"><h2>单张精锐收益</h2><p>以四人全员普通为基准，每次只将一名角色升为精锐。</p><div class="table-scroll"><table aria-label="单张精锐收益"><thead><tr><th scope="col">精锐角色</th><th scope="col">单回合层数</th><th scope="col">新增层数</th><th scope="col">收益提升</th></tr></thead><tbody id="gain-rows"></tbody></table></div><p>首张精锐优先级：佩佩 ＝ 奶兔 ＞ 银灰 ＞ M3。</p></div></section>
+<section id="best" role="tabpanel" aria-labelledby="tab-best" tabindex="0" hidden><div class="panel sheet"><h2>不同精锐数量的最优组合</h2><p>四人均上场，比较相同精锐数量下的最高单回合叠层。</p><div class="table-scroll"><table aria-label="不同精锐数量的最优组合"><thead><tr><th scope="col">精锐数量</th><th scope="col">最高层数</th><th scope="col">精锐角色（列出全部并列组合）</th></tr></thead><tbody id="best-rows"></tbody></table></div><p>最优顺序：佩佩 → 银灰 → 奶兔 → M3，或奶兔 → 银灰 → 佩佩 → M3。两条路线都是 36 → 54 → 75 → 100 → 111 层。</p></div></section>
       <p class="assumption">计算假设：每回合触发次数充足，佩佩均能叠满自身上限。</p>
     </main>
     <footer><span>妙妙小工具 / 四合院叠层实验室</span><span>非官方玩家工具</span></footer>
