@@ -10,7 +10,23 @@ const labels = ['不上场','普通','精锐'];
 const el = id => document.getElementById(id);
 const set = (id,value) => { el(id).textContent = value; };
 el('characters').innerHTML = characters.map(c => `<div class="character"><div class="identity"><span class="avatar ${c.id}" aria-hidden="true">${c.icon}</span><div><h3>${c.name}<span class="role">${c.role}</span></h3><p id="${c.id}-info"></p></div></div><div class="segmented" role="group" aria-label="${c.name}状态">${(c.id === 'pepe' ? [1,2] : [0,1,2]).map(v => `<button type="button" data-character="${c.id}" data-value="${v}" aria-pressed="false">${labels[v]}</button>`).join('')}</div></div>`).join('');
-const rows = combinations();
+const teammates = characters.slice(1);
+function lineupOrder(row) {
+  const ranks = teammates.map(character => row[character.id]);
+  const active = ranks.filter(rank => rank > 0).length;
+  const group = ranks.reduce((mask, rank) => mask * 2 + Number(rank > 0), 0);
+  const elites = ranks.filter(rank => rank === 2).length;
+  const eliteOrder = ranks.reduce((mask, rank) => mask * 2 + Number(rank === 2), 0);
+  return [active, -group, elites, -eliteOrder];
+}
+const rows = combinations().sort((left, right) => {
+  const a = lineupOrder(left);
+  const b = lineupOrder(right);
+  for (let i = 0; i < a.length; i++) {
+    if (a[i] !== b[i]) return a[i] - b[i];
+  }
+  return 0;
+});
 el('all-rows').innerHTML = rows.map((r,i) => `<tr data-row="${i}"><td>${['佩佩', ...characters.slice(1).filter(c => r[c.id]).map(c => c.name)].join('＋')}</td><td>${labels[r.rabbit].replace('不上场','—')}</td><td>${labels[r.silver].replace('不上场','—')}</td><td>${labels[r.m3].replace('不上场','—')}</td><td>${r.ordinary}</td><td>${r.elite}</td></tr>`).join('');
 function render() {
   const r = calculate(state);
@@ -58,12 +74,24 @@ const baseline = calculate().total;
 function tableRow(cells) {
   return '<tr>' + cells.map(cell => '<td>' + cell + '</td>').join('') + '</tr>';
 }
-el('gain-rows').innerHTML = tableRow(['全员普通', baseline, '基准', '—']) + characters.map(character => {
-  const total = calculate({[character.id]: 2}).total;
-  const added = total - baseline;
-  const percent = Number((100 * added / baseline).toFixed(2));
-  return tableRow([character.name, total, '+' + added, percent + '%']);
-}).join('');
+function signed(value) {
+  return value > 0 ? '+' + value : String(value);
+}
+function renderGains() {
+  const absent = el('absent').value;
+  const team = absent ? {[absent]: 0} : {};
+  const ordinary = calculate(team).total;
+  const reference = tableRow(['均为普通', ordinary, '基准', '—', signed(ordinary - baseline)]);
+  const upgrades = characters.filter(character => character.id !== absent).map(character => {
+    const total = calculate({...team, [character.id]: 2}).total;
+    const added = total - ordinary;
+    const percent = Number((100 * added / ordinary).toFixed(2));
+    return tableRow([character.name, total, signed(added), percent + '%', signed(total - baseline)]);
+  });
+  el('gain-rows').innerHTML = reference + upgrades.join('');
+}
+el('absent').addEventListener('change', renderGains);
+renderGains();
 
 const fullTeams = rows.filter(row => row.rabbit && row.silver && row.m3);
 const byCount = Array.from({length: 5}, () => []);
